@@ -25,10 +25,15 @@ public final class Suka extends JavaPlugin {
         pathnames = f.list();
         List<String> filenames = new ArrayList<>();
         assert pathnames != null;
-        for(String p : pathnames) {
-            if(p.endsWith(".su")) {
-                filenames.add(p);
+        try {
+            for(String p : pathnames) {
+                if(p.endsWith(".su")) {
+                    filenames.add(p);
+                }
             }
+        } catch(NullPointerException e) {
+            System.out.println("Something went wrong in loading files.");
+            this.getPluginLoader().disablePlugin(this);
         }
         List<Path> filepaths = new ArrayList<>();
         for (String fn: filenames) {
