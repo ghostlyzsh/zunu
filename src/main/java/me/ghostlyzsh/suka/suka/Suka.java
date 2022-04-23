@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 public final class Suka extends JavaPlugin {
     static HashMap<String, Boolean> hadError = new HashMap<>();
@@ -32,7 +33,7 @@ public final class Suka extends JavaPlugin {
                 }
             }
         } catch(NullPointerException e) {
-            System.out.println("Something went wrong in loading files.");
+            this.getLogger().log(Level.SEVERE, "Something went wrong in loading files.");
             this.getPluginLoader().disablePlugin(this);
         }
         List<Path> filepaths = new ArrayList<>();
