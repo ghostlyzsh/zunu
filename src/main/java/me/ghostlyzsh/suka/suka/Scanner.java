@@ -1,7 +1,9 @@
 package me.ghostlyzsh.suka.suka;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Scanner {
     private final String source;
@@ -10,6 +12,26 @@ public class Scanner {
     private int start = 0;
     private int current = 0;
     private int line = 1;
+
+    private static final Map<String, TokenType> keywords;
+
+    // define the keywords
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", TokenType.AND);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("for", TokenType.FOR);
+        keywords.put("fn", TokenType.FN);
+        keywords.put("if", TokenType.IF);
+        keywords.put("or", TokenType.OR);
+        keywords.put("return", TokenType.RETURN);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("var", TokenType.VAR);
+        keywords.put("int", TokenType.INTVAR);
+        keywords.put("float", TokenType.FLOATVAR);
+        keywords.put("while", TokenType.WHILE);
+    }
 
     Scanner(String source, String name) {
         this.source = source;
@@ -30,18 +52,36 @@ public class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(TokenType.LEFT_PAREN); break;
-            case ')': addToken(TokenType.RIGHT_PAREN); break;
-            case '{': addToken(TokenType.LEFT_BRACE); break;
-            case '}': addToken(TokenType.RIGHT_BRACE); break;
-            case ',': addToken(TokenType.COMMA); break;
-            case '.': addToken(TokenType.DOT); break;
-            case '-': addToken(TokenType.MINUS); break;
-            case '+': addToken(TokenType.PLUS); break;
-            case '*': addToken(TokenType.STAR); break;
+            case '(':
+                addToken(TokenType.LEFT_PAREN);
+                break;
+            case ')':
+                addToken(TokenType.RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(TokenType.LEFT_BRACE);
+                break;
+            case '}':
+                addToken(TokenType.RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(TokenType.COMMA);
+                break;
+            case '.':
+                addToken(TokenType.DOT);
+                break;
+            case '-':
+                addToken(TokenType.MINUS);
+                break;
+            case '+':
+                addToken(TokenType.PLUS);
+                break;
+            case '*':
+                addToken(TokenType.STAR);
+                break;
             case '/':
-                if(match('/')) {
-                    while(peek() != '\n' && !isAtEnd()) advance();
+                if (match('/')) {
+                    while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     addToken(TokenType.SLASH);
                 }
@@ -59,6 +99,11 @@ public class Scanner {
             case '>':
                 addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                 break;
+            case '|':
+                if (match('|')) {
+                    addToken(TokenType.OR);
+                }
+                break;
             case ' ':
             case '\r':
             case '\t':
@@ -70,8 +115,40 @@ public class Scanner {
             case '"': string(); break;
 
             default:
-                Suka.error(line, "Unexpected character.", this.name);
+                if(isDigit(c)) {
+                    number();
+                } else if (isAlpha(c)) {
+                    identifier();
+                } else {
+                    Suka.error(line, "Unexpected character.", this.name);
+                }
                 break;
+        }
+    }
+
+    private void identifier() {
+        while (isAlphaNumeric(peek())) advance();
+
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if(type == null) type = TokenType.IDENTIFIER;
+        addToken(type);
+    }
+
+    private void number() {
+        while (isDigit(peek())) advance();
+
+        // find the decimal point
+        boolean isFloat = false;
+        if(peek() == '.' && isDigit(peekNext())) {
+            advance();
+
+            while (isDigit(peek())) advance();
+        }
+        if(isFloat) {
+            addToken(TokenType.FLOAT, Float.parseFloat(source.substring(start, current)));
+        } else {
+            addToken(TokenType.INT, Integer.parseInt(source.substring(start, current)));
         }
     }
 
@@ -101,9 +178,28 @@ public class Scanner {
         addToken(TokenType.STRING, value);
     }
 
+    private char peekNext() {
+        if(current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isAlpha(char c) {
+        return  (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                 c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
+    }
+
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
     private boolean isAtEnd() {
