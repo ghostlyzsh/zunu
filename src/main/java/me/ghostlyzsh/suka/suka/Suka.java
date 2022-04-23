@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,9 @@ public final class Suka extends JavaPlugin {
         String[] pathnames;
 
         File f = new File("plugins/Suka");
+        if(!Files.exists(Paths.get("plugins/Suka"))) {
+            f.mkdir();
+        }
 
         pathnames = f.list();
         List<String> filenames = new ArrayList<>();
