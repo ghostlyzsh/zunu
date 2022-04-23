@@ -66,6 +66,9 @@ public class Scanner {
             case '\n':
                 line++;
                 break;
+
+            case '"': string(); break;
+
             default:
                 Suka.error(line, "Unexpected character.", this.name);
                 break;
@@ -78,6 +81,24 @@ public class Scanner {
 
         current++;
         return true;
+    }
+
+    private void string() {
+        while(peek() != '"' && !isAtEnd()) {
+            if(peek() == '\n') line++;
+            advance();
+        }
+
+        if(isAtEnd()) {
+            Suka.error(line, "Unterminated string.", this.name);
+            return;
+        }
+
+        advance(); // Closing "
+
+        // Trim surrounding quotes
+        String value = source.substring(start + 1, current - 1);
+        addToken(TokenType.STRING, value);
     }
 
     private char peek() {

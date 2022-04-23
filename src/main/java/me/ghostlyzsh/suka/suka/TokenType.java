@@ -1,5 +1,7 @@
 package me.ghostlyzsh.suka.suka;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
+
 public enum TokenType {
     // single-character tokens
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -10,7 +12,7 @@ public enum TokenType {
     GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
 
     // literals
-    IDENTIFIER, STRING, NUMBER,
+    IDENTIFIER, STRING, INT, FLOAT,
 
     // keywords
     AND, ELSE, FALSE, FN, FOR, IF, OR, SEND,

@@ -43,12 +43,13 @@ public final class Suka extends JavaPlugin {
                 e.printStackTrace();
             }
         }
-        for(byte[] content : contentStrings) {
-            System.out.println(new String(content, StandardCharsets.UTF_8));
+        for(int i = 0; i < contentStrings.size(); i++) {
+            runFile(contentStrings.get(i), filenames.get(i));
         }
     }
 
     private static void runFile(byte[] bytes, String name) {
+        hadError.put(name, false);
         run(new String(bytes, Charset.defaultCharset()), name);
     }
 
