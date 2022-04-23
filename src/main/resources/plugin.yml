@@ -1,0 +1,6 @@
+name: Suka
+version: '${project.version}'
+main: me.ghostlyzsh.suka.suka.Suka
+api-version: 1.18
+authors: [ ghostly_zsh ]
+description: A programming language made to make spigot development easier
