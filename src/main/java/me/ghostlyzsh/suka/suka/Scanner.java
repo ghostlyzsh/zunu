@@ -28,8 +28,6 @@ public class Scanner {
         keywords.put("return", TokenType.RETURN);
         keywords.put("true", TokenType.TRUE);
         keywords.put("var", TokenType.VAR);
-        keywords.put("int", TokenType.INTVAR);
-        keywords.put("float", TokenType.FLOATVAR);
         keywords.put("while", TokenType.WHILE);
     }
 
@@ -78,6 +76,9 @@ public class Scanner {
                 break;
             case '*':
                 addToken(TokenType.STAR);
+                break;
+            case ';':
+                addToken(TokenType.SEMICOLON);
                 break;
             case '/':
                 if (match('/')) {

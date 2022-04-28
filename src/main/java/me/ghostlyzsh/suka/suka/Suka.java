@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 public final class Suka extends JavaPlugin {
+    private static final Interpreter interpreter = new Interpreter();
     static HashMap<String, Boolean> hadError = new HashMap<>();
+    static HashMap<String, Boolean> hadRuntimeError = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -42,7 +44,7 @@ public final class Suka extends JavaPlugin {
         }
         List<Path> filepaths = new ArrayList<>();
         for (String fn: filenames) {
-            filepaths.add(Path.of("plugins/Suka/" + fn));
+            filepaths.add(Paths.get("plugins/Suka/" + fn));
         }
 
         List<byte[]> contentStrings = new ArrayList<>();
@@ -60,17 +62,20 @@ public final class Suka extends JavaPlugin {
 
     private static void runFile(byte[] bytes, String name) {
         hadError.put(name, false);
+        hadRuntimeError.put(name, false);
         run(new String(bytes, Charset.defaultCharset()), name);
     }
 
     private static void run(String source, String name) {
         Scanner scanner = new Scanner(source, name);
         List<Token> tokens = scanner.scanTokens();
+        Parser parser = new Parser(tokens, name);
+        Expr expression = parser.parse();
 
-        // for now print tokens
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
+        if(hadError.get(name)) return;
+        if(hadRuntimeError.get(name)) return;
+
+        interpreter.interpreter(expression, name);
     }
 
     static void error(int line, String message, String name) {
@@ -80,6 +85,19 @@ public final class Suka extends JavaPlugin {
     private static void report(int line, String where, String message, String name) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError.put(name, true);
+    }
+
+    static void error(Token token, String message, String name) {
+        if(token.type == TokenType.EOF) {
+            report(token.line, " at end", message, name);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message, name);
+        }
+    }
+
+    static void runtimeError(RuntimeError error, String name) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError.put(name, true);
     }
 
     @Override
