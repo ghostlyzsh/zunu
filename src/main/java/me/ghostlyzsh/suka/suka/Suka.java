@@ -70,12 +70,12 @@ public final class Suka extends JavaPlugin {
         Scanner scanner = new Scanner(source, name);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens, name);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         if(hadError.get(name)) return;
         if(hadRuntimeError.get(name)) return;
 
-        interpreter.interpreter(expression, name);
+        interpreter.interpreter(statements, name);
     }
 
     static void error(int line, String message, String name) {

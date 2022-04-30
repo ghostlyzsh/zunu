@@ -1,7 +1,5 @@
 package me.ghostlyzsh.suka.tool;
 
-import org.graalvm.compiler.core.common.Fields;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -19,6 +17,11 @@ public class GenerateAst {
                 "Grouping : Expr expression",
                 "Literal  : Object value",
                 "Unary    : Token operator, Expr right"
+        ));
+
+        defineAst(outputDir, "Stmt", Arrays.asList(
+                "Expression : Expr expression",
+                "Print      : Expr expression"
         ));
     }
     private static void defineAst(
