@@ -1,11 +1,10 @@
-package me.ghostlyzsh.suka.suka;
+package me.ghostlyzsh.zunu.zunu;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-public final class Suka extends JavaPlugin {
+public final class Zunu extends JavaPlugin {
     private static final Interpreter interpreter = new Interpreter();
     static HashMap<String, Boolean> hadError = new HashMap<>();
     static HashMap<String, Boolean> hadRuntimeError = new HashMap<>();
@@ -34,7 +33,7 @@ public final class Suka extends JavaPlugin {
         assert pathnames != null;
         try {
             for(String p : pathnames) {
-                if(p.endsWith(".su")) {
+                if(p.endsWith(".zn")) {
                     filenames.add(p);
                 }
             }

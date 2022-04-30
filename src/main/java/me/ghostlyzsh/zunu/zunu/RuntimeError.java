@@ -1,4 +1,4 @@
-package me.ghostlyzsh.suka.suka;
+package me.ghostlyzsh.zunu.zunu;
 
 public class RuntimeError extends RuntimeException {
     final Token token;

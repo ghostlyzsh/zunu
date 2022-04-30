@@ -1,4 +1,4 @@
-package me.ghostlyzsh.suka.suka;
+package me.ghostlyzsh.zunu.zunu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +163,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Suka.error(token, message, name);
+        Zunu.error(token, message, name);
         return new ParseError();
     }
 

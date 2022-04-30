@@ -1,4 +1,4 @@
-package me.ghostlyzsh.suka.suka;
+package me.ghostlyzsh.zunu.zunu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,7 +122,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Suka.error(line, "Unexpected character.", this.name);
+                    Zunu.error(line, "Unexpected character.", this.name);
                 }
                 break;
         }
@@ -169,7 +169,7 @@ public class Scanner {
         }
 
         if(isAtEnd()) {
-            Suka.error(line, "Unterminated string.", this.name);
+            Zunu.error(line, "Unterminated string.", this.name);
             return;
         }
 

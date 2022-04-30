@@ -1,6 +1,4 @@
-package me.ghostlyzsh.suka.suka;
-
-import java.util.List;
+package me.ghostlyzsh.zunu.zunu;
 
 abstract class Expr {
   interface Visitor<R> {

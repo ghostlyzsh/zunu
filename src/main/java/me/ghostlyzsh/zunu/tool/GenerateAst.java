@@ -1,4 +1,4 @@
-package me.ghostlyzsh.suka.tool;
+package me.ghostlyzsh.zunu.tool;
 
 import java.io.IOException;
 import java.io.PrintWriter;

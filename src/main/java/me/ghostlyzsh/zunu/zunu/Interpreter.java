@@ -1,4 +1,4 @@
-package me.ghostlyzsh.suka.suka;
+package me.ghostlyzsh.zunu.zunu;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 execute(statement);
             }
         } catch (RuntimeError e) {
-            Suka.runtimeError(e, name);
+            Zunu.runtimeError(e, name);
         }
     }
 
