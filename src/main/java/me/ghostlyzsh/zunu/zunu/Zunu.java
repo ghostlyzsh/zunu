@@ -56,7 +56,6 @@ public final class Zunu extends JavaPlugin {
         }
         for(int i = 0; i < contentStrings.size(); i++) {
             runFile(contentStrings.get(i), filenames.get(i));
-            System.out.println("interpreting");
         }
     }
 
