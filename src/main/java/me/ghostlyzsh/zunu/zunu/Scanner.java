@@ -44,7 +44,7 @@ public class Scanner {
             scanToken();
         }
 
-        tokens.add(new Token(TokenType.EOF, "", null, line));
+        tokens.add(new Token(TokenType.EOF, "", null, line, start));
         return tokens;
     }
 
@@ -106,6 +106,11 @@ public class Scanner {
                     addToken(TokenType.OR);
                 }
                 break;
+            case '&':
+                if(match('&')) {
+                    addToken(TokenType.AND);
+                }
+                break;
             case ' ':
             case '\r':
             case '\t':
@@ -122,7 +127,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Zunu.error(line, "Unexpected character.", this.name);
+                    Zunu.error(line, start, "Unexpected character.", this.name);
                 }
                 break;
         }
@@ -169,7 +174,7 @@ public class Scanner {
         }
 
         if(isAtEnd()) {
-            Zunu.error(line, "Unterminated string.", this.name);
+            Zunu.error(line, start, "Unterminated string.", this.name);
             return;
         }
 
@@ -218,6 +223,6 @@ public class Scanner {
 
     private void addToken(TokenType type, Object literal) {
         String text = source.substring(start, current);
-        tokens.add(new Token(type, text, literal, line));
+        tokens.add(new Token(type, text, literal, line, start));
     }
 }
