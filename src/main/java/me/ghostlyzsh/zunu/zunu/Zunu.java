@@ -10,14 +10,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public final class Zunu extends JavaPlugin {
-    private static final Interpreter interpreter = new Interpreter();
+    private static final HashMap<String, Interpreter> interpreters = new HashMap<>();
     static HashMap<String, Boolean> hadError = new HashMap<>();
     static HashMap<String, Boolean> hadRuntimeError = new HashMap<>();
 
@@ -82,7 +79,8 @@ public final class Zunu extends JavaPlugin {
         if(hadError.get(name)) return;
         if(hadRuntimeError.get(name)) return;
 
-        interpreter.interpreter(statements, name);
+        interpreters.put(name, new Interpreter());
+        interpreters.get(name).interpreter(statements, name);
     }
 
     static void error(int line, int start, String message, String name) {
@@ -91,10 +89,14 @@ public final class Zunu extends JavaPlugin {
 
     private static void report(int line, int start, String where, String message, String name) {
         int end = start;
+        int realStart = start;
+        while(Zunu.sources.get(name)[realStart] != '\n' && realStart > -1) {
+            realStart--;
+        }
         while(Zunu.sources.get(name)[end] != '\n' && end < Zunu.sources.get(name).length) {
             end++;
         }
-        String lineStr = new String(Arrays.copyOfRange(Zunu.sources.get(name), start, end));
+        String lineStr = new String(Arrays.copyOfRange(Zunu.sources.get(name), realStart, end)).trim();
         getPlugin(Zunu.class).getServer().getLogger().log(Level.SEVERE, "\u001b[31m" + "Error" + where + ": " + message + "\u001b[34m\n" +
                 "--> " + name + " : line " + line + "\n" +
                 "\t|\n" +

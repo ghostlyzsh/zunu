@@ -29,7 +29,8 @@ public class Scanner {
         keywords.put("true", TokenType.TRUE);
         keywords.put("let", TokenType.LET);
         keywords.put("while", TokenType.WHILE);
-        keywords.put("print", TokenType.PRINT);
+        keywords.put("break", TokenType.BREAK);
+        keywords.put("continue", TokenType.CONTINUE);
     }
 
     Scanner(String source, String name) {
@@ -70,13 +71,13 @@ public class Scanner {
                 addToken(TokenType.DOT);
                 break;
             case '-':
-                addToken(TokenType.MINUS);
+                addToken(match('=') ? TokenType.MINUS_EQUAL : TokenType.MINUS);
                 break;
             case '+':
-                addToken(TokenType.PLUS);
+                addToken(match('=') ? TokenType.PLUS_EQUAL : TokenType.PLUS);
                 break;
             case '*':
-                addToken(TokenType.STAR);
+                addToken(match('=') ? TokenType.STAR_EQUAL : TokenType.STAR);
                 break;
             case ';':
                 addToken(TokenType.SEMICOLON);
@@ -85,7 +86,7 @@ public class Scanner {
                 if (match('/')) {
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
-                    addToken(TokenType.SLASH);
+                    addToken(match('=') ? TokenType.SLASH_EQUAL : TokenType.SLASH);
                 }
                 break;
             // boolean operators
@@ -149,6 +150,8 @@ public class Scanner {
         boolean isFloat = false;
         if(peek() == '.' && isDigit(peekNext())) {
             advance();
+
+            isFloat = true;
 
             while (isDigit(peek())) advance();
         }

@@ -8,13 +8,15 @@ public enum TokenType {
     // one or two character tokens
     BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL,
     GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
+    PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL,
 
     // literals
     IDENTIFIER, STRING, INT, FLOAT,
 
     // keywords
     AND, ELSE, FALSE, FN, FOR, IF, OR, SEND,
-    RETURN, TRUE, LET, WHILE, PRINT,
+    RETURN, TRUE, LET, WHILE, BREAK,
+    CONTINUE,
 
     EOF
 }

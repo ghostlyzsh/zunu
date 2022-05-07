@@ -15,6 +15,7 @@ public class GenerateAst {
         defineAst(outputDir, "Expr", Arrays.asList(
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
+                "Call     : Expr callee, Token paren, List<Expr> arguments",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
                 "Logical  : Expr left, Token operator, Expr right",
@@ -25,11 +26,14 @@ public class GenerateAst {
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Block      : List<Stmt> statements",
                 "Expression : Expr expression",
+                "Function   : Token name, List<Token> params," +
+                        " List<Stmt> body",
                 "If         : Expr condition, Stmt thenBranch," +
                         " Stmt elseBranch",
                 "While      : Expr condition, Stmt body",
-                "Print      : Expr expression",
-                "Let        : Token name, Expr initializer"
+                "Let        : Token name, Expr initializer",
+                "Break      :",
+                "Continue   :"
         ));
     }
     private static void defineAst(
@@ -49,8 +53,12 @@ public class GenerateAst {
         // The AST classes.
         for (String type : types) {
             String className = type.split(":")[0].trim();
-            String fields = type.split(":")[1].trim(); // [robust]
-            defineType(writer, baseName, className, fields);
+            try {
+                String fields = type.split(":")[1].trim(); // [robust]
+                defineType(writer, baseName, className, fields);
+            } catch(ArrayIndexOutOfBoundsException e) {
+                defineType(writer, baseName, className, null);
+            }
         }
 
         // The base accept() method.
@@ -81,16 +89,30 @@ public class GenerateAst {
                 baseName + " {");
 
         // Constructor.
-        writer.println("    " + className + "(" + fieldList + ") {");
-
-        // Store parameters in fields.
-        String[] fields = fieldList.split(", ");
-        for (String field : fields) {
-            String name = field.split(" ")[1];
-            writer.println("      this." + name + " = " + name + ";");
+        if(fieldList != null) {
+            writer.println("    " + className + "(" + fieldList + ") {");
+        } else {
+            writer.println("    " + className + "() {");
         }
 
-        writer.println("    }");
+        // Store parameters in fields.
+        if(fieldList != null) {
+            String[] fields = fieldList.split(", ");
+            for (String field : fields) {
+                String name = field.split(" ")[1];
+                writer.println("      this." + name + " = " + name + ";");
+            }
+
+            writer.println("    }");
+
+            // Fields.
+            writer.println();
+            for (String field : fields) {
+                writer.println("    final " + field + ";");
+            }
+        } else {
+            writer.println("    }");
+        }
 
         // Visitor pattern.
         writer.println();
@@ -100,11 +122,6 @@ public class GenerateAst {
                 className + baseName + "(this);");
         writer.println("    }");
 
-        // Fields.
-        writer.println();
-        for (String field : fields) {
-            writer.println("    final " + field + ";");
-        }
 
         writer.println("  }");
     }

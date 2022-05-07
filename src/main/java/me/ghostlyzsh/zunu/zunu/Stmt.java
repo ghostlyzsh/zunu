@@ -6,34 +6,52 @@ abstract class Stmt {
   interface Visitor<R> {
     R visitBlockStmt(Block stmt);
     R visitExpressionStmt(Expression stmt);
+    R visitFunctionStmt(Function stmt);
     R visitIfStmt(If stmt);
     R visitWhileStmt(While stmt);
-    R visitPrintStmt(Print stmt);
     R visitLetStmt(Let stmt);
+    R visitBreakStmt(Break stmt);
+    R visitContinueStmt(Continue stmt);
   }
   static class Block extends Stmt {
     Block(List<Stmt> statements) {
       this.statements = statements;
     }
 
+    final List<Stmt> statements;
+
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitBlockStmt(this);
     }
-
-    final List<Stmt> statements;
   }
   static class Expression extends Stmt {
     Expression(Expr expression) {
       this.expression = expression;
     }
 
+    final Expr expression;
+
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitExpressionStmt(this);
     }
+  }
+  static class Function extends Stmt {
+    Function(Token name, List<Token> params, List<Stmt> body) {
+      this.name = name;
+      this.params = params;
+      this.body = body;
+    }
 
-    final Expr expression;
+    final Token name;
+    final List<Token> params;
+    final List<Stmt> body;
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitFunctionStmt(this);
+    }
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -42,14 +60,14 @@ abstract class Stmt {
       this.elseBranch = elseBranch;
     }
 
+    final Expr condition;
+    final Stmt thenBranch;
+    final Stmt elseBranch;
+
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitIfStmt(this);
     }
-
-    final Expr condition;
-    final Stmt thenBranch;
-    final Stmt elseBranch;
   }
   static class While extends Stmt {
     While(Expr condition, Stmt body) {
@@ -57,25 +75,13 @@ abstract class Stmt {
       this.body = body;
     }
 
+    final Expr condition;
+    final Stmt body;
+
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitWhileStmt(this);
     }
-
-    final Expr condition;
-    final Stmt body;
-  }
-  static class Print extends Stmt {
-    Print(Expr expression) {
-      this.expression = expression;
-    }
-
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitPrintStmt(this);
-    }
-
-    final Expr expression;
   }
   static class Let extends Stmt {
     Let(Token name, Expr initializer) {
@@ -83,13 +89,31 @@ abstract class Stmt {
       this.initializer = initializer;
     }
 
+    final Token name;
+    final Expr initializer;
+
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitLetStmt(this);
     }
+  }
+  static class Break extends Stmt {
+    Break() {
+    }
 
-    final Token name;
-    final Expr initializer;
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBreakStmt(this);
+    }
+  }
+  static class Continue extends Stmt {
+    Continue() {
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitContinueStmt(this);
+    }
   }
 
   abstract <R> R accept(Visitor<R> visitor);
