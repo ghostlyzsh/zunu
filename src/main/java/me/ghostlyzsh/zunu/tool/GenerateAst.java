@@ -16,6 +16,7 @@ public class GenerateAst {
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
                 "Call     : Expr callee, Token paren, List<Expr> arguments",
+                "AnonFn   : List<Token> params, List<Stmt> body",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
                 "Logical  : Expr left, Token operator, Expr right",
@@ -31,6 +32,7 @@ public class GenerateAst {
                 "If         : Expr condition, Stmt thenBranch," +
                         " Stmt elseBranch",
                 "While      : Expr condition, Stmt body",
+                "Return     : Token keyword, Expr value",
                 "Let        : Token name, Expr initializer",
                 "Break      :",
                 "Continue   :"

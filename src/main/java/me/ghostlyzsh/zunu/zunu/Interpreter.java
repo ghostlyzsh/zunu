@@ -1,7 +1,11 @@
 package me.ghostlyzsh.zunu.zunu;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Environment globals = new Environment();
@@ -22,7 +26,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             @Override
             public String toString() { return "<native fn>"; }
         });
-        globals.define("print", new ZunuCallable() {
+        globals.define("log", new ZunuCallable() {
             @Override
             public int arity() {
                 return -1;
@@ -30,11 +34,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
+                String str = new String();
                 for(Object argument : arguments) {
-                    String str = String.valueOf(argument);
-                    System.out.print(str);
+                    str += String.valueOf(argument);
                 }
-                System.out.println();
+                JavaPlugin.getPlugin(Zunu.class).getServer().getLogger().info(str);
                 return null;
             }
         });
@@ -248,6 +252,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitAnonFnExpr(Expr.AnonFn expr) {
+        ZunuAnonFunction function = new ZunuAnonFunction(expr, environment);
+        return function;
+    }
+
+    @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
         return evaluate(expr.expression);
     }
@@ -349,7 +359,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        ZunuFunction function = new ZunuFunction(stmt);
+        ZunuFunction function = new ZunuFunction(stmt, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -362,6 +372,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             execute(stmt.elseBranch);
         }
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if(stmt.value != null) value = evaluate(stmt.value);
+
+        throw new Return(value);
     }
 
     public Void visitLetStmt(Stmt.Let stmt) {

@@ -29,9 +29,21 @@ public class Parser {
         return statements;
     }
 
+    private Stmt declaration() {
+        try {
+            if(match(TokenType.FN)) if(check(TokenType.IDENTIFIER)) return function("function");
+            if(match(TokenType.LET)) return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+
     private Stmt statement() {
         if(match(TokenType.FOR)) return forStatement();
         if(match(TokenType.IF)) return ifStatement();
+        if(match(TokenType.RETURN)) return returnStatement();
         if(match(TokenType.WHILE)) return whileStatement();
         if(match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
         if(match(TokenType.BREAK)) return breakStatement();
@@ -105,6 +117,17 @@ public class Parser {
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if(!check(TokenType.SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(TokenType.SEMICOLON, "Expected ';' after return value");
+        return new Stmt.Return(keyword, value);
+    }
+
     private Stmt varDeclaration() {
         Token name = consume(TokenType.IDENTIFIER, "Expected variable name.");
 
@@ -133,7 +156,10 @@ public class Parser {
     }
 
     private Stmt.Function function(String kind) {
-        Token name = consume(TokenType.IDENTIFIER, "Expected " + kind + " name");
+        Token name = null;
+        if(check(TokenType.IDENTIFIER)) {
+            name = advance();
+        }
         consume(TokenType.LEFT_PAREN, "Expected '(' after " + kind + " name");
         List<Token> parameters = new ArrayList<>();
         if(!check(TokenType.RIGHT_PAREN)) {
@@ -162,7 +188,7 @@ public class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = operEqual();
+        Expr expr = anonFn();
 
         if(match(TokenType.EQUAL)) {
             Token equals = previous();
@@ -177,6 +203,27 @@ public class Parser {
         }
 
         return expr;
+    }
+
+    private Expr anonFn() {
+        if(match(TokenType.FN)) {
+            consume(TokenType.LEFT_PAREN, "Expected '(' after 'fn' in anonymous function");
+            List<Token> parameters = new ArrayList<>();
+            if(!check(TokenType.RIGHT_PAREN)) {
+                do {
+                    if(parameters.size() >= 255) {
+                        error(peek(), "Can't have more than 255 parameters");
+                    }
+                    parameters.add(consume(TokenType.IDENTIFIER, "Expected parameter name"));
+                } while(match(TokenType.COMMA));
+            }
+            consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters");
+            consume(TokenType.LEFT_BRACE, "Expected '{' before anonymous function body");
+            List<Stmt> body = block();
+            return new Expr.AnonFn(parameters, body);
+        }
+
+        return operEqual();
     }
 
     private Expr operEqual() {
@@ -233,17 +280,6 @@ public class Parser {
 
     private Expr expression() {
         return assignment();
-    }
-
-    private Stmt declaration() {
-        try {
-            if(match(TokenType.FN)) return function("function");
-            if(match(TokenType.LET)) return varDeclaration();
-            return statement();
-        } catch (ParseError error) {
-            synchronize();
-            return null;
-        }
     }
 
     private Expr equality() {
@@ -336,6 +372,7 @@ public class Parser {
     private Expr primary() {
         if(match(TokenType.FALSE)) return new Expr.Literal(false);
         if(match(TokenType.TRUE)) return new Expr.Literal(true);
+        if(match(TokenType.NULL)) return new Expr.Literal(null);
 
         if(match(TokenType.INT, TokenType.FLOAT, TokenType.STRING)) {
             return new Expr.Literal(previous().literal);

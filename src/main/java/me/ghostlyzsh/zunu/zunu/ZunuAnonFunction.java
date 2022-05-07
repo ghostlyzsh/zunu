@@ -2,18 +2,18 @@ package me.ghostlyzsh.zunu.zunu;
 
 import java.util.List;
 
-public class ZunuFunction implements ZunuCallable {
-    private final Stmt.Function declaration;
+public class ZunuAnonFunction implements ZunuCallable {
+    private final Expr.AnonFn declaration;
     private final Environment closure;
 
-    ZunuFunction(Stmt.Function declaration, Environment closure) {
+    ZunuAnonFunction(Expr.AnonFn declaration, Environment closure) {
         this.closure = closure;
         this.declaration = declaration;
     }
 
     @Override
     public String toString() {
-        return "<fn " + declaration.name.lexeme + ">";
+        return "<anon fn>";
     }
 
     @Override
