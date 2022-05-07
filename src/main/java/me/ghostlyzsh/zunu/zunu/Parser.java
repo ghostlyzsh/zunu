@@ -187,6 +187,10 @@ public class Parser {
         return statements;
     }
 
+    private Expr expression() {
+        return assignment();
+    }
+
     private Expr assignment() {
         Expr expr = anonFn();
 
@@ -276,10 +280,6 @@ public class Parser {
         }
 
         return expr;
-    }
-
-    private Expr expression() {
-        return assignment();
     }
 
     private Expr equality() {

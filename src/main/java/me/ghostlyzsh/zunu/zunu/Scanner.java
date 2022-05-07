@@ -53,6 +53,7 @@ public class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
+            // all the single character tokens. it simply adds tokens when it finds characters
             case '(':
                 addToken(TokenType.LEFT_PAREN);
                 break;
@@ -71,6 +72,7 @@ public class Scanner {
             case '.':
                 addToken(TokenType.DOT);
                 break;
+            // single or two character tokens. this checks for the next token before adding a token
             case '-':
                 addToken(match('=') ? TokenType.MINUS_EQUAL : TokenType.MINUS);
                 break;
@@ -83,8 +85,10 @@ public class Scanner {
             case ';':
                 addToken(TokenType.SEMICOLON);
                 break;
+            // slash(/), slash equal(/=), and comments(//)
             case '/':
                 if (match('/')) {
+                    // go to the end of the line or file
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     addToken(match('=') ? TokenType.SLASH_EQUAL : TokenType.SLASH);
@@ -113,6 +117,7 @@ public class Scanner {
                     addToken(TokenType.AND);
                 }
                 break;
+            // disregard whitespace, but on newline increment line number
             case ' ':
             case '\r':
             case '\t':
@@ -136,15 +141,18 @@ public class Scanner {
     }
 
     private void identifier() {
+        // go forward while the character is a-zA-Z0-9
         while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
+        // see if the type is a keyword, otherwise mark it as an identifier
         TokenType type = keywords.get(text);
         if(type == null) type = TokenType.IDENTIFIER;
         addToken(type);
     }
 
     private void number() {
+        // advance while the character is 0-9
         while (isDigit(peek())) advance();
 
         // find the decimal point
@@ -154,6 +162,7 @@ public class Scanner {
 
             isFloat = true;
 
+            // continue while there's a digit
             while (isDigit(peek())) advance();
         }
         if(isFloat) {
@@ -172,6 +181,7 @@ public class Scanner {
     }
 
     private void string() {
+        // continue to advance while the character isn't at the end or a "
         while(peek() != '"' && !isAtEnd()) {
             if(peek() == '\n') line++;
             advance();
@@ -190,11 +200,13 @@ public class Scanner {
     }
 
     private char peekNext() {
+        // two character lookahead
         if(current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
 
     private boolean isAlpha(char c) {
+        // a-zA-Z_
         return  (c >= 'a' && c <= 'z') ||
                 (c >= 'A' && c <= 'Z') ||
                  c == '_';
@@ -205,6 +217,7 @@ public class Scanner {
     }
 
     private char peek() {
+        // look at the current character without advancing
         if (isAtEnd()) return '\0';
         return source.charAt(current);
     }
@@ -226,6 +239,7 @@ public class Scanner {
     }
 
     private void addToken(TokenType type, Object literal) {
+        // generate a token and add it to the token array
         String text = source.substring(start, current);
         tokens.add(new Token(type, text, literal, line, start));
     }
