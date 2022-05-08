@@ -79,20 +79,26 @@ public class Scanner {
             case '+':
                 addToken(match('=') ? TokenType.PLUS_EQUAL : TokenType.PLUS);
                 break;
-            case '*':
-                addToken(match('=') ? TokenType.STAR_EQUAL : TokenType.STAR);
-                break;
-            case ';':
-                addToken(TokenType.SEMICOLON);
-                break;
             // slash(/), slash equal(/=), and comments(//)
             case '/':
                 if (match('/')) {
                     // go to the end of the line or file
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if(match('*')) {
+                    while((!match('*') || peek() != '/') && !isAtEnd()) {
+                        if(peek() == '\n') line++;
+                        advance();
+                    }
+                    advance();
                 } else {
                     addToken(match('=') ? TokenType.SLASH_EQUAL : TokenType.SLASH);
                 }
+                break;
+            case '*':
+                addToken(match('=') ? TokenType.STAR_EQUAL : TokenType.STAR);
+                break;
+            case ';':
+                addToken(TokenType.SEMICOLON);
                 break;
             // boolean operators
             case '!':
